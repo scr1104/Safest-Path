@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:search_map_place/search_map_place.dart';
+
+import 'package:safestpath/constants/constants.dart';
 
 //This serves as the 'View' of the model view controller archetecture
 void main() {
@@ -49,32 +51,22 @@ class _mainMapState extends State<mainMap> {
     super.initState();
 
     try {
-
       _location$ = _location.onLocationChanged.listen((newLocalData) {
         this.setState(() {
           userLoc = LatLng(newLocalData.latitude, newLocalData.longitude);
-          safestDirection.add(
-            Polyline(
-              points: [
-                LatLng(12.988827, 77.472091),
-                LatLng(12.980821, 77.470815),
-                LatLng(12.969406, 77.471301)
-              ],
-              endCap: Cap.squareCap,
-              geodesic: false,
-              polylineId: PolylineId("line_one"),
-            ),
-          );
-          safestDirection.add(
-            Polyline(
-              points: [
-                LatLng(12.949798, 77.470534),
-                LatLng(12.938614, 77.469379)
-              ],
-              color: Colors.amber,
-              polylineId: PolylineId("line_one"),
-            ),
-          );
+//          safestDirection.add(
+//            Polyline(
+//              points: [
+//                LatLng(12.988827, 77.472091),
+//                LatLng(12.980821, 77.470815),
+//                LatLng(12.969406, 77.471301)
+//              ],
+//              endCap: Cap.squareCap,
+//              geodesic: false,
+//              polylineId: PolylineId("line_one"),
+//            ),
+//          );
+
           selfMarker['marker'] = Marker(
               markerId: MarkerId("me"),
               position: userLoc,
@@ -100,7 +92,6 @@ class _mainMapState extends State<mainMap> {
   }
 
   //handles loading for current location using futurebuilder
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,9 +105,7 @@ class _mainMapState extends State<mainMap> {
                 GoogleMap(
                   onMapCreated: (GoogleMapController controller) {
                     mapController = controller;
-                    rootBundle.loadString('assets/google_maps_style.txt').then((style) {
-                      mapController.setMapStyle(style);
-                    });
+                    mapController.setMapStyle(mapStyle);
                   },
                   markers: Set.of((selfMarker['marker'] != null)
                       ? [selfMarker['marker']]
@@ -131,22 +120,9 @@ class _mainMapState extends State<mainMap> {
                   ),
                   polylines: safestDirection,
                 ),
-                Positioned(
-                    top: 60,
-                    right: 40,
-                    child: IconButton(
-                      icon: Icon(Icons.adjust),
-                      onPressed: () {
-                        if (mapController != null) {
-                          mapController.animateCamera(
-                              CameraUpdate.newCameraPosition(new CameraPosition(
-                                  bearing: 0,
-                                  target: userLoc,
-                                  tilt: 0,
-                                  zoom: 15.00)));
-                        }
-                      },
-                    )),
+                _mapOverlays(
+                    mapController: this.mapController,
+                    userLoc: this.userLoc),
               ],
             );
           } else {
@@ -168,5 +144,62 @@ class _mainMapState extends State<mainMap> {
       _location$.cancel();
     }
     super.dispose();
+  }
+}
+
+class _mapOverlays extends StatefulWidget {
+  GoogleMapController mapController;
+  LatLng userLoc;
+  _mapOverlays({this.mapController, this.userLoc});
+
+  @override
+  _mapOverlaysState createState() => _mapOverlaysState();
+}
+
+class _mapOverlaysState extends State<_mapOverlays> {
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: <Widget>[
+        Positioned(
+        top: 10,
+        right: 0,
+        child: SearchMapPlaceWidget(
+          apiKey: API_KEY, // YOUR GOOGLE MAPS API KEY
+          language: 'en',
+          // The position used to give better recomendations. In this case we are using the user position
+          location: widget.userLoc,
+          radius: 30000,
+          onSelected: (Place place) async {
+            final geolocation = await place.geolocation;
+
+            widget.mapController.animateCamera(
+                CameraUpdate.newLatLng(geolocation.coordinates));
+            widget.mapController.animateCamera(
+                CameraUpdate.newLatLngBounds(
+                    geolocation.bounds, 0));
+          },
+        )),
+    Positioned(
+        top: 60,
+        right: 40,
+        child: IconButton(
+          icon: Icon(Icons.adjust),
+          onPressed: () {
+            if (widget.mapController != null) {
+              widget.mapController.animateCamera(
+                  CameraUpdate.newCameraPosition(new CameraPosition(
+                      bearing: 0,
+                      target: widget.userLoc,
+                      tilt: 0,
+                      zoom: 15.00)));
+            }
+          },
+        ))
+      ],
+    );
+
   }
 }

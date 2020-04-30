@@ -21,6 +21,7 @@ dependencies:
     sdk: flutter
   google_maps_flutter: ^0.5.11
   location: ^3.0.0
+  search_map_place: ^0.3.0
 
   # Use with the Cupertino Icons class for iOS style icons.
   cupertino_icons: ^0.1.2
@@ -42,8 +43,7 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  assets:
-    - assets/google_maps_style.txt
+
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

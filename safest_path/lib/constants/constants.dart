@@ -1,3 +1,5 @@
+String mapStyle = ''' 
+
 [
   {
     "elementType": "geometry",
@@ -213,3 +215,7 @@
     ]
   }
 ]
+
+''';
+
+String API_KEY = "AIzaSyB108SjYU07nAyB7X_vuvUnZk6c9mP6FBA";
