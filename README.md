@@ -3,4 +3,4 @@ Flutter app for finding the least dangerous path based on government crime data
 - Currently in development
 
 ## Known Issues
- - google maps custom styling not applied ####fixed
+ - google maps custom styling not applied : fixed
