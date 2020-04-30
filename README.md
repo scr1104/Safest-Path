@@ -1,6 +1,6 @@
-# safestpath
-Flutter app for finding the least dangerous path based on government crime data
-- Currently in development
+# safestpath - Currently in development
+This flutter app finds the user the statistically safest path for walking in the Toronto Area.
+ - utilizing crime data from government sources such as the Toronto Police Service
 
 ## TODO
  - [x] implement basic map with self location
@@ -17,3 +17,7 @@ Flutter app for finding the least dangerous path based on government crime data
  
 ## Known Issues
  - [ ] google maps custom styling not applied
+
+## Credits
+##### Lead Programmer - Jefferson Li
+##### Data Scientist & UI UX designer - Chaerin Song
