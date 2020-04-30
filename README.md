@@ -21,3 +21,8 @@ This flutter app finds the user the statistically safest path for walking in the
 ## Credits
 ##### Programmer - Jefferson Li
 ##### Data Scientist & UI UX designer - Chaerin Song
+| Role       | Individual  |
+| ------------- | -----:|
+| Programmer    | Jefferson Li|
+| Data Scientist| Chaerin Song|
+| UI UX Designer| Chaerin Song|
