@@ -16,7 +16,7 @@ This flutter app finds the user the statistically safest path for walking in the
  - [ ] deploy on google playstore + appstore
  
 ## Known Issues
- - [ ] google maps custom styling not applied
+ - [x] google maps custom styling not applied
 
 ## Credits
 ##### Lead Programmer - Jefferson Li
