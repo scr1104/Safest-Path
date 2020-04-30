@@ -19,5 +19,5 @@ This flutter app finds the user the statistically safest path for walking in the
  - [x] google maps custom styling not applied
 
 ## Credits
-##### Lead Programmer - Jefferson Li
+##### Programmer - Jefferson Li
 ##### Data Scientist & UI UX designer - Chaerin Song
