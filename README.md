@@ -18,11 +18,13 @@ This flutter app finds the user the statistically safest path for walking in the
 ## Known Issues
  - [x] google maps custom styling not applied
 
+## Potential Future Features
+ - [ ] extend the app beyond Toronto
+ - [ ] find safest bus/bike routes
+ - [ ] dark theme
 ## Credits
-##### Programmer - Jefferson Li
-##### Data Scientist & UI UX designer - Chaerin Song
-| Role       | Individual  |
-| ------------- | -----:|
+| Role          | Individual  |
+| ------------- | -----:      |
 | Programmer    | Jefferson Li|
 | Data Scientist| Chaerin Song|
 | UI UX Designer| Chaerin Song|
