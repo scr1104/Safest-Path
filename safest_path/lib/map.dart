@@ -6,6 +6,7 @@ import 'package:search_map_place/search_map_place.dart';
 
 import 'package:safestpath/constants/strings.dart';
 import 'package:safestpath/constants/constants.dart';
+import 'package:safestpath/path.dart';
 
 class mainMap extends StatefulWidget {
   @override
@@ -14,7 +15,7 @@ class mainMap extends StatefulWidget {
 
 class _mainMapState extends State<mainMap> {
   GoogleMapController mapController;
-
+  DirectionUtility dirUtil = DirectionUtility(API_KEY);
   Location _location = Location();
   var _location$;
   LatLng userLoc;
@@ -29,34 +30,40 @@ class _mainMapState extends State<mainMap> {
 
   @override
   void initState() {
-    print('init');
     super.initState();
 
     try {
+
       _location$ = _location.onLocationChanged.listen((newLocalData) {
+
+        LatLng newUserLoc =
+            LatLng(newLocalData.latitude, newLocalData.longitude);
+
         this.setState(() {
-          userLoc = LatLng(newLocalData.latitude, newLocalData.longitude);
-//          safestDirection.add(
-//            Polyline(
-//              points: [
-//                LatLng(12.988827, 77.472091),
-//                LatLng(12.980821, 77.470815),
-//                LatLng(12.969406, 77.471301)
-//              ],
-//              endCap: Cap.squareCap,
-//              geodesic: false,
-//              polylineId: PolylineId("line_one"),
-//            ),
-//          );
+          userLoc = newUserLoc;
 
           allMarkers['self'] = Marker(
-              markerId: MarkerId("self"),
-              position: userLoc,
-              rotation: newLocalData.heading,
-              draggable: false,
-              zIndex: 2,
-              flat: true,
+            markerId: MarkerId("self"),
+            position: LatLng(newLocalData.latitude, newLocalData.longitude),
+            rotation: newLocalData.heading,
+            draggable: false,
+            zIndex: 2,
+            flat: true,
+          );
+
+          if (allMarkers['dest'].position != LatLng(0.0, 0.0)) {
+            dirUtil.getDirection(newUserLoc, allMarkers['dest'].position).then((res){
+              safestDirection.add(
+                  Polyline(
+                      polylineId: PolylineId("directionLine"),
+                      points: res,
+                  endCap: Cap.squareCap,
+                  geodesic: false,
+                  width: 3,
+                  color: Color.fromRGBO(256, 256, 256, 0.5)),
               );
+            });
+          }
         });
       });
     } on PlatformException catch (e) {
@@ -67,20 +74,21 @@ class _mainMapState extends State<mainMap> {
   }
 
   void setDest() async {
+    // get center of screen, maps lib might have a better way to do this in the future
     var avg = (double a, double b) => (a + b) / 2;
     LatLng swCorner = (await mapController.getVisibleRegion()).southwest;
     LatLng neCorner = (await mapController.getVisibleRegion()).northeast;
-
     LatLng centerscreen = LatLng(avg(swCorner.latitude, neCorner.latitude),
         avg(swCorner.longitude, neCorner.longitude));
+
     this.setState(() {
       allMarkers['dest'] = Marker(
-          markerId: MarkerId("dest"),
-          position: centerscreen,
-          draggable: false,
-          zIndex: 2,
-          flat: true,);
-      print(allMarkers['dest']);
+        markerId: MarkerId("dest"),
+        position: centerscreen,
+        draggable: false,
+        zIndex: 2,
+        flat: true,
+      );
     });
   }
 
@@ -112,7 +120,6 @@ class _mainMapState extends State<mainMap> {
                 ),
                 _mapOverlays(
                     mapController: this.mapController, userLoc: this.userLoc),
-
               ],
             );
           } else {
@@ -192,8 +199,7 @@ class _mapOverlaysState extends State<_mapOverlays> {
               },
             )),
         Positioned.fill(
-          child: Align(
-              alignment: Alignment.center, child: Icon(Icons.add)),
+          child: Align(alignment: Alignment.center, child: Icon(Icons.add)),
         )
       ],
     );
