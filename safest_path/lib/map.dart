@@ -112,10 +112,7 @@ class _mainMapState extends State<mainMap> {
                 ),
                 _mapOverlays(
                     mapController: this.mapController, userLoc: this.userLoc),
-                Positioned.fill(
-                  child: Align(
-                      alignment: Alignment.center, child: Icon(Icons.add)),
-                )
+
               ],
             );
           } else {
@@ -193,7 +190,11 @@ class _mapOverlaysState extends State<_mapOverlays> {
                           zoom: 15.00)));
                 }
               },
-            ))
+            )),
+        Positioned.fill(
+          child: Align(
+              alignment: Alignment.center, child: Icon(Icons.add)),
+        )
       ],
     );
   }
