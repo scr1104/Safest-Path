@@ -6,7 +6,7 @@ This flutter app finds the user the statistically safest path for walking in the
  - [x] implement basic map with self location
  - [x] implement button to center map at self location 
  - [x] implement target location by searching 
- - [ ] implement target location by aiming
+ - [x] implement target location by aiming
  - [ ] implement crime data sourcing and storage (local vs firestore???)
  - [ ] implement data wrangling  
  - [ ] implement custom path with local crime heatmap generation
@@ -18,6 +18,7 @@ This flutter app finds the user the statistically safest path for walking in the
  
 ## Known Issues
  - [x] google maps custom styling not applied
+ - [ ] custom styling has wierd font
 
 ## Potential Future Features
  - [ ] extend the app beyond Toronto
