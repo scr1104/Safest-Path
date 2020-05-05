@@ -7,6 +7,9 @@ import 'package:search_map_place/search_map_place.dart';
 import 'package:safestpath/constants/strings.dart';
 import 'package:safestpath/constants/constants.dart';
 import 'package:safestpath/path.dart';
+import 'package:safestpath/heatmap.dart';
+import 'package:safestpath/CustomUtils.dart';
+import 'dart:async';
 
 class mainMap extends StatefulWidget {
   @override
@@ -15,9 +18,12 @@ class mainMap extends StatefulWidget {
 
 class _mainMapState extends State<mainMap> {
   GoogleMapController mapController;
+  Completer<GoogleMapController> _asyncMapController = Completer();
+
   DirectionUtility dirUtil = DirectionUtility(API_KEY);
   Location _location = Location();
   var _location$;
+  var _VRChanged$;
   LatLng userLoc;
 
   var allMarkers = {
@@ -33,9 +39,9 @@ class _mainMapState extends State<mainMap> {
     super.initState();
 
     try {
+      // subscribe to all listeners we need here
 
       _location$ = _location.onLocationChanged.listen((newLocalData) {
-
         LatLng newUserLoc =
             LatLng(newLocalData.latitude, newLocalData.longitude);
 
@@ -52,20 +58,34 @@ class _mainMapState extends State<mainMap> {
           );
 
           if (allMarkers['dest'].position != LatLng(0.0, 0.0)) {
-            dirUtil.getDirection(newUserLoc, allMarkers['dest'].position).then((res){
+            dirUtil
+                .getDirection(newUserLoc, allMarkers['dest'].position)
+                .then((res) {
               safestDirection.add(
-                  Polyline(
-                      polylineId: PolylineId("directionLine"),
-                      points: res,
-                  endCap: Cap.squareCap,
-                  geodesic: false,
-                  width: 3,
-                  color: Color.fromRGBO(256, 256, 256, 0.5)),
+                Polyline(
+                    polylineId: PolylineId("directionLine"),
+                    points: res,
+                    endCap: Cap.squareCap,
+                    geodesic: false,
+                    width: 3,
+                    color: Color.fromRGBO(256, 256, 256, 0.5)),
               );
             });
           }
         });
       });
+
+      // need to define a mini function as we need to use await
+      // while making iniState to be async is undesirable
+      (() async {
+        _VRChanged$ = CustomStreams.onVisibleRegionChangedStream(
+            (await _asyncMapController.future), Duration(microseconds: 100))
+            .listen((b) {
+          print('camera moved');
+        });
+      })();
+
+
     } on PlatformException catch (e) {
       if (e.code == 'PERMISSION_DENIED') {
         debugPrint("Permission Denied");
@@ -105,8 +125,11 @@ class _mainMapState extends State<mainMap> {
               children: <Widget>[
                 GoogleMap(
                   onMapCreated: (GoogleMapController controller) {
-                    mapController = controller;
-                    mapController.setMapStyle(mapStyle);
+                    this.setState(() {
+                      mapController = controller;
+                      mapController.setMapStyle(mapStyle);
+                      _asyncMapController.complete(controller);
+                    });
                   },
                   mapToolbarEnabled: false,
                   markers: Set.of(allMarkers.values.toList()),
@@ -123,10 +146,15 @@ class _mainMapState extends State<mainMap> {
               ],
             );
           } else {
-            return Expanded(
-              child: SizedBox(
-                child: CircularProgressIndicator(),
-              ),
+            return Flex(
+              direction: Axis.horizontal,
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              ],
             );
           }
         },
@@ -143,8 +171,11 @@ class _mainMapState extends State<mainMap> {
   @override
   void dispose() {
     //clean up subscriptions
-    if (_location$ != null) {
+    if (_location$) {
       _location$.cancel();
+    }
+    if (_VRChanged$) {
+      _VRChanged$.cancel();
     }
     super.dispose();
   }

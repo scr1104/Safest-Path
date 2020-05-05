@@ -19,6 +19,7 @@ This flutter app finds the user the statistically safest path for walking in the
 ## Known Issues
  - [x] google maps custom styling not applied
  - [ ] custom styling has wierd font
+ - [ ] perhaps replace all `GoogleMapController mapController` usages with `Completer<GoogleMapController> _asyncMapController`
 
 ## Potential Future Features
  - [ ] extend the app beyond Toronto
