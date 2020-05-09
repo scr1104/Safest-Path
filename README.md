@@ -2,6 +2,14 @@
 This flutter app finds the user the statistically safest path for walking in the Toronto Area.
  - utilizing crime data from government sources such as the Toronto Police Service
  - Custom apis written in Flask backend
+## GET STARTED
+ - frontend
+   1. open the project using android studio using flutter
+ - backend
+   1. create your python virtual enviroment
+   2. run 'pip install flask' in created enviroment
+   3. run 'set FLASK_APP=app.py' 
+   4. 'flask run' to run server 
 ## TODO - Flutter Frontend
  - [x] implement basic map with self location
  - [x] implement button to center map at self location 
