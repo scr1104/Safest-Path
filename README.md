@@ -7,6 +7,7 @@ This flutter app finds the user the statistically safest path for walking in the
  - [x] implement button to center map at self location 
  - [x] implement target location by searching 
  - [x] implement target location by aiming
+ - [ ] implement 'start nav'
  - [ ] implement crime data sourcing and storage (local vs firestore??? 
  - [ ] implement data wrangling  
  - [ ] implement custom path with local crime heatmap generation
