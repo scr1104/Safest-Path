@@ -19,6 +19,7 @@ class mainMap extends StatefulWidget {
 class _mainMapState extends State<mainMap> {
   GoogleMapController mapController;
   Completer<GoogleMapController> _asyncMapController = Completer();
+  HeatmapGenerator heatmapController ;
 
   DirectionUtility dirUtil = DirectionUtility(API_KEY);
   Location _location = Location();
@@ -26,11 +27,9 @@ class _mainMapState extends State<mainMap> {
   var _VRChanged$;
   LatLng userLoc;
 
-  var allMarkers = {
-    'self': Marker(markerId: MarkerId("1")),
-    'dest': Marker(markerId: MarkerId("2"))
-  };
-  var heatmapCircles = [];
+  Marker destmarker = Marker(markerId: MarkerId("dest"));
+
+  Set<Circle> heatmapCircles = {};
 
   Set<Polyline> safestDirection = {};
 
@@ -38,28 +37,19 @@ class _mainMapState extends State<mainMap> {
   void initState() {
     super.initState();
 
+    
     try {
       // subscribe to all listeners we need here
-
       _location$ = _location.onLocationChanged.listen((newLocalData) {
-        LatLng newUserLoc =
-            LatLng(newLocalData.latitude, newLocalData.longitude);
-
         this.setState(() {
-          userLoc = newUserLoc;
+          userLoc = LatLng(newLocalData.latitude, newLocalData.longitude);
 
-          allMarkers['self'] = Marker(
-            markerId: MarkerId("self"),
-            position: LatLng(newLocalData.latitude, newLocalData.longitude),
-            rotation: newLocalData.heading,
-            draggable: false,
-            zIndex: 2,
-            flat: true,
-          );
-
-          if (allMarkers['dest'].position != LatLng(0.0, 0.0)) {
+          //if destination exists, we do it here as a subscription
+          // bc we want to continuously modify the path as user moves
+          // todo edit this polyline to custom
+          if (destmarker.position != LatLng(0.0, 0.0)) {
             dirUtil
-                .getDirection(newUserLoc, allMarkers['dest'].position)
+                .getDirection(userLoc, destmarker.position)
                 .then((res) {
               safestDirection.add(
                 Polyline(
@@ -75,17 +65,19 @@ class _mainMapState extends State<mainMap> {
         });
       });
 
-      // need to define a mini function as we need to use await
-      // while making iniState to be async is undesirable
-      (() async {
-        _VRChanged$ = CustomStreams.onVisibleRegionChangedStream(
-            (await _asyncMapController.future), Duration(microseconds: 100))
-            .listen((b) {
-          print('camera moved');
+      //since when this init runs, google map might not have been built yet,
+      // so we use this promise to make sure the controller is assigned
+      _asyncMapController.future.then((contr) {
+        setState(() {
+          heatmapController = HeatmapGenerator(heatmapCircles);
         });
-      })();
 
-
+//        _VRChanged$ = CustomStreams.onVisibleRegionChangedStream(
+//                contr, Duration(microseconds: 100))
+//            .listen((b) {
+//          print('camera moved');
+//        });
+      });
     } on PlatformException catch (e) {
       if (e.code == 'PERMISSION_DENIED') {
         debugPrint("Permission Denied");
@@ -102,13 +94,20 @@ class _mainMapState extends State<mainMap> {
         avg(swCorner.longitude, neCorner.longitude));
 
     this.setState(() {
-      allMarkers['dest'] = Marker(
+      //set destination marker
+      destmarker = Marker(
         markerId: MarkerId("dest"),
         position: centerscreen,
         draggable: false,
         zIndex: 2,
         flat: true,
       );
+
+      //set danger ratings
+      //check if heatmapController is initialized
+      if(heatmapController != null && userLoc != null){
+        heatmapController.generateInArea(userLoc, centerscreen);
+      }
     });
   }
 
@@ -132,8 +131,9 @@ class _mainMapState extends State<mainMap> {
                     });
                   },
                   mapToolbarEnabled: false,
-                  markers: Set.of(allMarkers.values.toList()),
-                  circles: Set.from(heatmapCircles),
+                  markers: {destmarker},
+                  circles: heatmapCircles,
+                  myLocationEnabled: true,
                   initialCameraPosition: CameraPosition(
                     target:
                         LatLng(snapshot.data.latitude, snapshot.data.longitude),

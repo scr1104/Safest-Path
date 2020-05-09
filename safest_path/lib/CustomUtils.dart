@@ -2,7 +2,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class CustomStreams{
 
-  static Stream<bool> onVisibleRegionChangedStream(GoogleMapController mapController,Duration dur) async* {
+  static Stream<bool> onVisibleRegionChangedStream(GoogleMapController mapController, Duration dur) async* {
     LatLngBounds pastCamPos = await mapController.getVisibleRegion();
     while (true) {
       await Future.delayed(dur);
