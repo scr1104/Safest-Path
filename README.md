@@ -1,14 +1,14 @@
 # safestpath - Currently in development
 This flutter app finds the user the statistically safest path for walking in the Toronto Area.
  - utilizing crime data from government sources such as the Toronto Police Service
-
-## TODO
+ - Custom apis written in Flask backend
+## TODO - Flutter Frontend
  - [x] implement basic map with self location
  - [x] implement button to center map at self location 
  - [x] implement target location by searching 
  - [x] implement target location by aiming
  - [ ] implement 'start nav'
- - [ ] implement crime data sourcing and storage (local vs firestore??? 
+ - [ ] implement crime data sourcing and storage (Flask backend)
  - [ ] implement data wrangling  
  - [ ] implement custom path with local crime heatmap generation
    - [ ] custom path
@@ -20,7 +20,12 @@ This flutter app finds the user the statistically safest path for walking in the
    - [ ] custom google maps style from https://mapstyle.withgoogle.com/
    - [ ] _mapOverlay styling
  - [ ] deploy on google playstore + appstore
- 
+
+## TODO - Flask backend
+ - [ ] store data in sqlite db
+ - [ ] implement retrieval apis
+ - [ ] restrict usage
+
 ## Known Issues
  - [x] google maps custom styling not applied
  - [ ] custom styling has wierd font
