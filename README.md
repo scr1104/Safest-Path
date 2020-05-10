@@ -9,7 +9,7 @@ This flutter app finds the user the statistically safest path for walking in the
    1. create your python virtual enviroment
    2. run 'pip install flask' in created enviroment
    3. run 'set FLASK_APP=app.py' 
-   4. 'flask run' to run server 
+   4. 'flask run' to run server
 ## TODO - Flutter Frontend
  - [x] implement basic map with self location
  - [x] implement button to center map at self location 
